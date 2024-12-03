@@ -9,12 +9,12 @@ import android.widget.DatePicker
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.viewpager2.widget.ViewPager2
 import com.example.fragmentgg1.R
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-// Page1Fragment.kt
 class Page1Fragment : Fragment() {
     private lateinit var viewModel: MyViewModel
 
@@ -30,18 +30,26 @@ class Page1Fragment : Fragment() {
         val view = inflater.inflate(R.layout.page1_fragment, container, false)
 
         val datePicker = view.findViewById<DatePicker>(R.id.datePicker)
+        datePicker.calendarViewShown = false
 
-        // Use init instead of setOnDateChangedListener for better compatibility
+        // Initialize with current date
+        val calendar = Calendar.getInstance()
         datePicker.init(
-            datePicker.year,
-            datePicker.month,
-            datePicker.dayOfMonth
-        ) { _, year, monthOfYear, dayOfMonth ->
-            val calendar = Calendar.getInstance()
-            calendar.set(year, monthOfYear, dayOfMonth)
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ) { _, year, month, day ->
+            val selectedCalendar = Calendar.getInstance()
+            selectedCalendar.set(year, month, day)
             val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            val formattedDate = dateFormat.format(calendar.time)
-            viewModel.value.setValue(formattedDate)  // Using the existing setValue method
+            val formattedDate = dateFormat.format(selectedCalendar.time)
+            viewModel.value.setValue(formattedDate)
+        }
+
+        // Add navigation button logic
+        view.findViewById<Button>(R.id.nextButton)?.setOnClickListener {
+            val viewPager = activity?.findViewById<ViewPager2>(R.id.pager)
+            viewPager?.currentItem = 1  // Go to next page
         }
 
         return view
